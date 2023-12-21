@@ -4,6 +4,7 @@ import { doAuth } from 'auth';
 
 // controllers
 import * as indexController from './controllers/index';
+import * as usersController from './controllers/users';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -15,7 +16,7 @@ app.use(morgan('dev'));
 
 // primary app routes
 app.get('/', indexController.index);
-app.post('/signup', indexController.postSignup);
+app.post('/signup', usersController.postSignup);
 
 app.post('/auth', (req, res) => {
   res.send(doAuth());
