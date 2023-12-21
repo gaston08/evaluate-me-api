@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import { doAuth } from 'auth';
+import connect from './connect';
 
 // controllers
 import * as indexController from './controllers/index';
@@ -13,6 +14,9 @@ const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
+
+const mongoUrl = process.env.MONGODB_URI;
+connect({ db: mongoUrl });
 
 // primary app routes
 app.get('/', indexController.index);
