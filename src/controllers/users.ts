@@ -2,6 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { body, check, validationResult } from 'express-validator';
 import { User, UserDocument, AuthToken } from '../models/User';
 
+/**
+ * Create a new local account.
+ * @route POST /signup
+ */
+
 export const postSignup = async (
 	req: Request,
 	res: Response,
