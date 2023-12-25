@@ -16,7 +16,7 @@
     "paths": {},
     "esModuleInterop": true
   },
-  "files": [],
+  "files": ["custom.d.ts"],
   "include": [],
   "references": [
     {

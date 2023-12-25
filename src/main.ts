@@ -19,6 +19,7 @@ connect({ db: mongoUrl });
 
 // primary app routes
 app.get('/', indexController.index);
+app.get('/auth', indexController.checkAuth, indexController.indexAuth);
 app.post('/signup', usersController.signup);
 app.post('/login', usersController.login);
 

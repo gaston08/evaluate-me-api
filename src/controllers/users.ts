@@ -98,8 +98,8 @@ export const login = async (
 				}
 				if (isMatch) {
 					user.password = undefined;
-					// expiration time in 3 min
-					const expiresIn = 3 * 60;
+					// expiration time in 1 hs
+					const expiresIn = 60 * 60 * 60;
 
 					const token = jwt.sign(
 						JSON.parse(JSON.stringify(user)),
