@@ -1,6 +1,5 @@
 import express from 'express';
 import morgan from 'morgan';
-import { doAuth } from 'auth';
 import connect from './connect';
 
 // controllers
@@ -22,10 +21,6 @@ connect({ db: mongoUrl });
 app.get('/', indexController.index);
 app.post('/signup', usersController.signup);
 app.post('/login', usersController.login);
-
-app.post('/auth', (req, res) => {
-  res.send(doAuth());
-});
 
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);

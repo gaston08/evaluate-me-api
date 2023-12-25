@@ -13,9 +13,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "auth": ["auth/src/index.ts"]
-    },
+    "paths": {},
     "esModuleInterop": true
   },
   "files": [],
