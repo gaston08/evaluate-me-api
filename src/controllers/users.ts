@@ -204,13 +204,6 @@ export const updatePassword = async (
 			token,
 		});
 	} catch (err) {
-		if (err.code === 11000) {
-			res.status(400).json({
-				message:
-					'The email address you have entered is already associated with an account.',
-			});
-			return;
-		}
 		return next(err);
 	}
 };
