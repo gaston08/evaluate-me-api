@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, check, validationResult } from 'express-validator';
+import { User, UserDocument, AuthToken } from '../models/User';
 
 export const postSignup = async (
 	req: Request,
@@ -24,34 +25,29 @@ export const postSignup = async (
 		return;
 	}
 
-	/*const user = new User({
+	const user = new User({
 		email: req.body.email,
 		password: req.body.password,
 	});
 
-	User.findOne(
-		{ email: req.body.email },
-		(err: NativeError, existingUser: UserDocument) => {
-			if (err) {
-				return next(err);
-			}
-			if (existingUser) {
-				req.flash('errors', {
-					msg: 'Account with that email address already exists.',
-				});
-				return res.redirect('/signup');
-			}
-			user.save((err) => {
-				if (err) {
-					return next(err);
-				}
-				req.logIn(user, (err) => {
-					if (err) {
-						return next(err);
-					}
-					res.redirect('/');
-				});
+	try {
+		const result: UserDocument | null = await User.findOne({
+			email: req.body.email,
+		});
+
+		if (result === null) {
+			const userDoc: UserDocument = await user.save();
+			userDoc.password = undefined;
+
+			res.status(200).json({
+				user: userDoc,
+			});
+		} else {
+			res.status(400).json({
+				message: 'Account with that email address already exists',
 			});
 		}
-	);*/
+	} catch (err) {
+		return next(err);
+	}
 };
