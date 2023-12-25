@@ -118,7 +118,7 @@ export const login = async (
 
 /**
  * Update profile information.
- * @route POST /account/profile
+ * @route POST /update
  */
 export const updateProfile = async (
 	req: Request,
@@ -147,6 +147,55 @@ export const updateProfile = async (
 		user.profile.location = req.body.profile.location || '';
 		user.profile.website = req.body.profile.website || '';
 		const userDoc = await user.save();
+		userDoc.password = undefined;
+
+		const token = getAuthToken(userDoc);
+
+		res.status(200).json({
+			token,
+		});
+	} catch (err) {
+		if (err.code === 11000) {
+			res.status(400).json({
+				message:
+					'The email address you have entered is already associated with an account.',
+			});
+			return;
+		}
+		return next(err);
+	}
+};
+
+/**
+ * Update current password.
+ * @route POST /update/password
+ */
+export const updatePassword = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	await check('password', 'Password must be at least 4 characters long')
+		.isLength({ min: 4 })
+		.run(req);
+	await check('confirmPassword', 'Passwords do not match')
+		.equals(req.body.password)
+		.run(req);
+
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		res.status(400).json({
+			errors: errors.array(),
+		});
+		return;
+	}
+
+	try {
+		const user: UserDocument | null = await User.findById(req.user._id);
+		user.password = req.body.password;
+		const userDoc = await user.save();
+
 		userDoc.password = undefined;
 
 		const token = getAuthToken(userDoc);

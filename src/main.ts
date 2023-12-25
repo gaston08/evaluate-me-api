@@ -22,7 +22,16 @@ app.get('/', indexController.index);
 app.get('/auth', indexController.checkAuth, indexController.indexAuth);
 app.post('/signup', usersController.signup);
 app.post('/login', usersController.login);
-app.post('/update', indexController.checkAuth, usersController.updateProfile);
+app.post(
+  '/update/profile',
+  indexController.checkAuth,
+  usersController.updateProfile
+);
+app.post(
+  '/update/password',
+  indexController.checkAuth,
+  usersController.updatePassword
+);
 
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);
