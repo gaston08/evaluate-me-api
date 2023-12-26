@@ -4,7 +4,7 @@ ACCESS_TOKEN_DIR="${PWD}/access_token.txt"
 ACCESS_TOKEN=`cat ${ACCESS_TOKEN_DIR}`
 
 # make post request and sen user.json
-curl -i -X POST http://localhost:3000/update/profile \
+curl -i -X POST http://localhost:3000/user/update/profile \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${ACCESS_TOKEN}" \
   --data-binary "@${PWD}/users/data/newUser.json" |

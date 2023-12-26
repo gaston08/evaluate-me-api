@@ -23,16 +23,20 @@ app.get('/auth', indexController.checkAuth, indexController.indexAuth);
 app.post('/signup', usersController.signup);
 app.post('/login', usersController.login);
 app.post(
-  '/update/profile',
+  '/user/update/profile',
   indexController.checkAuth,
   usersController.updateProfile
 );
 app.post(
-  '/update/password',
+  '/user/update/password',
   indexController.checkAuth,
   usersController.updatePassword
 );
-app.post('/delete', indexController.checkAuth, usersController.deleteAccount);
+app.post(
+  '/user/delete',
+  indexController.checkAuth,
+  usersController.deleteAccount
+);
 
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);
