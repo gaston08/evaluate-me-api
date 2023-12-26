@@ -207,3 +207,28 @@ export const updatePassword = async (
 		return next(err);
 	}
 };
+
+/**
+ * Delete user account.
+ * @route POST /account/delete
+ */
+export const deleteAccount = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	try {
+		const result = await User.deleteOne({ _id: req.user._id });
+		if (result.acknowledged && result.deletedCount === 1) {
+			res.status(200).json({
+				message: 'ok',
+			});
+		} else {
+			res.status(400).json({
+				message: 'cannot delete user',
+			});
+		}
+	} catch (err) {
+		return next(err);
+	}
+};

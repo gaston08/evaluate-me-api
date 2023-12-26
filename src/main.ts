@@ -32,6 +32,7 @@ app.post(
   indexController.checkAuth,
   usersController.updatePassword
 );
+app.post('/delete', indexController.checkAuth, usersController.deleteAccount);
 
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);
