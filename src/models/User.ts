@@ -6,7 +6,7 @@ export type UserDocument = mongoose.Document & {
   email: string;
   password: string;
   passwordResetToken: string;
-  passwordResetExpires: Date;
+  passwordResetExpires: number;
 
   facebook: string;
   twitter: string;
@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
       required: false,
     },
     passwordResetExpires: {
-      type: Date,
+      type: Number,
       required: false,
     },
 

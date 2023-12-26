@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, check, validationResult } from 'express-validator';
+import nodemailer from 'nodemailer';
 import { User, UserDocument, AuthToken } from '../models/User';
 import { getAuthToken } from '../utils/common';
+import crypto from 'crypto';
+import { transporter } from '../main';
 
 /**
  * Create a new local account.
@@ -226,6 +229,70 @@ export const deleteAccount = async (
 		} else {
 			res.status(400).json({
 				message: 'cannot delete user',
+			});
+		}
+	} catch (err) {
+		return next(err);
+	}
+};
+
+/**
+ * Create a random token, then the send user an email with a reset link.
+ * @route POST /user/forgot/password
+ */
+export const forgotPassword = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	await check('email', 'Please enter a valid email address.')
+		.isEmail()
+		.run(req);
+	await body('email').normalizeEmail({ gmail_remove_dots: false }).run(req);
+
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		res.status(400).json({
+			errors: errors.array(),
+		});
+		return;
+	}
+
+	try {
+		const user: UserDocument | null = await User.findOne({
+			email: req.body.email,
+		});
+		if (user === null) {
+			res.status(400).json({
+				message: `account with that email doesn't exist`,
+			});
+			return;
+		}
+
+		const random_token = crypto.randomBytes(32).toString('hex');
+		user.passwordResetToken = random_token;
+		user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+		await user.save();
+
+		const mailOptions = {
+			from: process.env.EMAIL_SENDER,
+			to: 'gastigasti0808@gmail.com',
+			subject: 'Reset your password',
+			text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+          Please click on the following link, or paste this into your browser to complete the process:\n\n
+          http://${req.headers.host}/reset/${random_token}\n\n
+          If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+		};
+
+		const result = await transporter.sendMail(mailOptions);
+		if (result.accepted.length === 1) {
+			res.status(200).json({
+				message: 'email sended',
+			});
+		} else {
+			res.status(500).json({
+				message: 'can not send email',
 			});
 		}
 	} catch (err) {
