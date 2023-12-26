@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # make post request and sen user.json
-curl -i -X POST http://localhost:3000/user/reset/password/3f207c5329fbfc3621bac9242215ff47c2c9b00ba4c718a2773ca707fcaf0353 \
+curl -i -X POST http://localhost:3000/user/reset/password/461574466237d1a52a7c216c1f35b6ecab65e76bf0824afb390b46e3187567e0 \
   -H "Content-Type: application/json" \
   --data-binary "@${PWD}/users/data/user.json" |
     sed -e 's/[{}]/''/g' | 
