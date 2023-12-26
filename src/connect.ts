@@ -18,5 +18,6 @@ export default ({ db }: TInput) => {
   };
   connect();
 
+  mongoose.set('debug', true);
   mongoose.connection.on('disconnected', connect);
 };

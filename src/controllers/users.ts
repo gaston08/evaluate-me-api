@@ -299,3 +299,71 @@ export const forgotPassword = async (
 		return next(err);
 	}
 };
+
+/**
+ * Process the reset password request.
+ * @route POST /user/reset/password
+ */
+export const resetPassword = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	await check('password', 'Password must be at least 4 characters long.')
+		.isLength({ min: 4 })
+		.run(req);
+	await check('confirmPassword', 'Passwords must match.')
+		.equals(req.body.password)
+		.run(req);
+
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		res.status(400).json({
+			errors: errors.array(),
+		});
+		return;
+	}
+
+	try {
+		const user: UserDocument | null = await User.findOne({
+			passwordResetToken: req.params.token,
+		})
+			.where('passwordResetExpires')
+			.gt(Date.now())
+			.exec();
+
+		if (user === null) {
+			res.status(400).json({
+				message: `token invalid or has expired`,
+			});
+			return;
+		}
+
+		user.password = req.body.password;
+		user.passwordResetToken = undefined;
+		user.passwordResetExpires = undefined;
+
+		await user.save();
+
+		const mailOptions = {
+			from: process.env.EMAIL_SENDER,
+			to: 'gastigasti0808@gmail.com',
+			subject: 'your password has changed',
+			text: `password changed successfully`,
+		};
+
+		const result = await transporter.sendMail(mailOptions);
+		if (result.accepted.length === 1) {
+			res.status(200).json({
+				message: 'email sended',
+			});
+		} else {
+			res.status(500).json({
+				message: 'can not send email',
+			});
+		}
+	} catch (err) {
+		return next(err);
+	}
+};

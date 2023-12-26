@@ -39,6 +39,7 @@ app.post(
   usersController.deleteAccount
 );
 app.post('/user/forgot/password', usersController.forgotPassword);
+app.post('/user/reset/password/:token', usersController.resetPassword);
 
 export const transporter = nodemailer.createTransport({
   service: 'Outlook365',
