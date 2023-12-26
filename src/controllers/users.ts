@@ -118,7 +118,7 @@ export const login = async (
 
 /**
  * Update profile information.
- * @route POST /update
+ * @route POST /user/update/profile
  */
 export const updateProfile = async (
 	req: Request,
@@ -168,7 +168,7 @@ export const updateProfile = async (
 
 /**
  * Update current password.
- * @route POST /update/password
+ * @route POST /user/update/password
  */
 export const updatePassword = async (
 	req: Request,
@@ -210,7 +210,7 @@ export const updatePassword = async (
 
 /**
  * Delete user account.
- * @route POST /account/delete
+ * @route POST /user/delete
  */
 export const deleteAccount = async (
 	req: Request,
