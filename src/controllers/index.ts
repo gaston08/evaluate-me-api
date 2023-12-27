@@ -3,7 +3,7 @@ import { body, check, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
 export const index = (req: Request, res: Response) => {
-	res.send({ message: 'Hello API' });
+	res.status(200).json({ message: 'Hello API' });
 };
 
 export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
