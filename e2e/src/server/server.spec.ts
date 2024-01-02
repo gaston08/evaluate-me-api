@@ -51,7 +51,7 @@ describe('indexControllers', () => {
   });
 
   it('should return logged', async () => {
-    const res = await axios.get('/auth', {
+    const res = await axios.post('/auth', {
       headers: {
         authorization: `Bearer ${access_token}`,
       },
@@ -62,14 +62,14 @@ describe('indexControllers', () => {
   });
 
   it('should return 403 no token provided', async () => {
-    const res = await axios.get('/auth');
+    const res = await axios.post('/auth');
 
     expect(res.status).toBe(403);
     expect(res.data).toEqual({ message: 'no token provided' });
   });
 
   it('should return 403 no token provided', async () => {
-    const res = await axios.get('/auth', {
+    const res = await axios.post('/auth', {
       headers: { authorization: 'bad token' },
     });
     console.log(res);
