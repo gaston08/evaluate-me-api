@@ -10,11 +10,7 @@ import { transporter } from '../main';
  * @route POST /signup
  */
 
-export const signup = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-): Promise<void> => {
+export const signup = async (req: Request, res: Response): Promise<void> => {
 	await check('email', 'Email is not valid').isEmail().run(req);
 	await check('password', 'Password must be at least 4 characters long')
 		.isLength({ min: 4 })
@@ -68,11 +64,7 @@ export const signup = async (
  * @route POST /login
  */
 
-export const login = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-): Promise<void> => {
+export const login = async (req: Request, res: Response): Promise<void> => {
 	await check('email', 'Email is not valid').isEmail().run(req);
 	await check('password', 'Password cannot be blank')
 		.isLength({ min: 1 })

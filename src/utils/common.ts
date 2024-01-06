@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
 
 export const getAuthToken = (data) => {
 	// expiration time in 1 hs
