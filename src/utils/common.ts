@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
 export const getAuthToken = (data) => {
 	// expiration time in 1 hs
@@ -13,4 +14,13 @@ export const getAuthToken = (data) => {
 	);
 
 	return token;
+};
+
+interface errorResponse {
+	status: number;
+	error: string;
+}
+
+export const errorHandler = (error): errorResponse => {
+	return { status: 500, error: error.message || '' };
 };

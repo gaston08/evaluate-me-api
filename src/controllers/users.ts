@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, check, validationResult } from 'express-validator';
 import { User, UserDocument } from '../models/User';
-import { getAuthToken } from '../utils/common';
+import { getAuthToken, errorHandler } from '../utils/common';
 import crypto from 'crypto';
 import { transporter } from '../main';
 
@@ -56,7 +56,10 @@ export const signup = async (
 			});
 		}
 	} catch (err) {
-		return next(err);
+		const { error, status } = errorHandler(err);
+		res.status(status).json({
+			error,
+		});
 	}
 };
 
@@ -96,7 +99,8 @@ export const login = async (
 		} else {
 			user.comparePassword(req.body.password, (err, isMatch) => {
 				if (err) {
-					return next(err);
+					errorHandler(err);
+					return;
 				}
 				if (isMatch) {
 					user.password = undefined;
@@ -114,7 +118,10 @@ export const login = async (
 			});
 		}
 	} catch (err) {
-		return next(err);
+		const { error, status } = errorHandler(err);
+		res.status(status).json({
+			error,
+		});
 	}
 };
 
