@@ -17,5 +17,8 @@
       "rules": {}
     }
   ],
-  "extends": ["./.eslintrc.base.json"]
+  "extends": ["./.eslintrc.base.json"],
+  "rules": {
+    "@typescript-eslint/no-var-requires": 0
+  }
 }

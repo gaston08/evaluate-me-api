@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, check, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
 export const index = (req: Request, res: Response) => {

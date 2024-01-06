@@ -27,7 +27,7 @@ export type UserDocument = mongoose.Document & {
 
 type comparePasswordFunction = (
   candidatePassword: string,
-  cb: (err: any, isMatch: any) => void
+  cb: (err: object, isMatch: boolean) => void
 ) => void;
 
 export interface AuthToken {

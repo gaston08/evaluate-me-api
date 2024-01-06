@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { User } from '../../../src/models/User';
 
-const access_token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NThhZmYxYjM5YzFkOWVjMmEwYTdkYmQiLCJlbWFpbCI6Imdhc3RvbjA4cGVkcmF6YUBnbWFpbC5jb20iLCJ0b2tlbnMiOltdLCJjcmVhdGVkQXQiOiIyMDIzLTEyLTI2VDE2OjI4OjExLjc4NloiLCJ1cGRhdGVkQXQiOiIyMDIzLTEyLTI2VDE2OjMwOjAyLjEzMloiLCJfX3YiOjAsImlhdCI6MTcwMzYxNDU4OCwiZXhwIjozNTk1Nzc0NTg4fQ.CPWWeLhZIPDqDGhHFMO9fG6NONG6ZLg2hOSNsO3cyuI`;
+const access_token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTk4ODczNjM5YTI2NTAxNGExNjQwNzUiLCJlbWFpbCI6Imdhc3RpQGdtYWlsLmNvbSIsInRva2VucyI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDEtMDVUMjI6NDg6MjIuNjA4WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMDVUMjI6NDg6MjIuNjA4WiIsIl9fdiI6MCwiaWF0IjoxNzA0NDk0OTEwLCJleHAiOjE3MDQ3MTA5MTB9.otU8ll9U55MRwcCd_ghuw1VjQBQK__vlFK-5iJ6V4UI`;
 jest
   .spyOn(User.prototype, 'save')
   .mockImplementationOnce(() => Promise.resolve({ user: true }));

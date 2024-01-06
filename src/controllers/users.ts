@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, check, validationResult } from 'express-validator';
-import nodemailer from 'nodemailer';
-import { User, UserDocument, AuthToken } from '../models/User';
+import { User, UserDocument } from '../models/User';
 import { getAuthToken } from '../utils/common';
 import crypto from 'crypto';
 import { transporter } from '../main';
