@@ -215,8 +215,7 @@ export const updatePassword = async (
  */
 export const deleteAccount = async (
 	req: Request,
-	res: Response,
-	next: NextFunction
+	res: Response
 ): Promise<void> => {
 	try {
 		const result = await User.deleteOne({ _id: req.user._id });
@@ -230,7 +229,10 @@ export const deleteAccount = async (
 			});
 		}
 	} catch (err) {
-		return next(err);
+		const { error, status } = errorHandler(err);
+		res.status(status).json({
+			error,
+		});
 	}
 };
 

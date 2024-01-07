@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { errorHandler } from '../utils/common';
 
 export const index = (req: Request, res: Response) => {
 	res.status(200).json({ message: 'Hello API' });
@@ -20,7 +21,10 @@ export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
 		return next();
 		next();
 	} catch (err) {
-		return next(err);
+		const { error, status } = errorHandler(err);
+		res.status(status).json({
+			error,
+		});
 	}
 };
 

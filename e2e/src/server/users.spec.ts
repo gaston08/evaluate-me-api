@@ -113,19 +113,108 @@ describe('users controller', () => {
     });
   });
 
-  describe('delete user', () => {
-    it('should delete user successfully', async () => {
-      const res = await axios.post(
-        '/user/delete',
-        {},
-        {
-          headers: {
-            authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
-      expect(res.status).toBe(200);
-      expect(res.data.message).toBe('ok');
+  describe('require authorization', () => {
+    describe('checkAuth middleware', () => {
+      it('should return 403 no token provided', async () => {
+        const res = await axios.post('/auth');
+
+        expect(res.status).toBe(403);
+        expect(res.data.message).toBe('no token provided');
+      });
+
+      it('should return status 500 and jwt malformed error', async () => {
+        const res = await axios.post(
+          '/auth',
+          {},
+          { headers: { authorization: 'Bearer invalidtoken' } }
+        );
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe('jwt malformed');
+      });
+
+      it('should return status 500 and invalid token error', async () => {
+        const res = await axios.post(
+          '/auth',
+          {},
+          { headers: { authorization: `Bearer BADTOKEN${access_token}` } }
+        );
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe('invalid token');
+      });
+
+      it('should return status 500 and jwt expired error', async () => {
+        const res = await axios.post(
+          '/auth',
+          {},
+          {
+            headers: {
+              authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTlhYWRhMWM4NWQxOWM2YTg3YTk5MWYiLCJlbWFpbCI6Imdhc3RpQGdtYWlsLmNvbSIsInRva2VucyI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDEtMDdUMTM6NTY6NDkuODg2WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMDdUMTM6NTY6NDkuODg2WiIsIl9fdiI6MCwiaWF0IjoxNzA0NjM1ODEyLCJleHAiOjE3MDQ2MzU4MjJ9.1F89rCSVUZmAKf-FvwyZ3RG1oIkbwfKw0qo7HAkreVE`,
+            },
+          }
+        );
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe('jwt expired');
+      });
+
+      it('should return status 500 and invalid signature error', async () => {
+        const res = await axios.post(
+          '/auth',
+          {},
+          {
+            headers: {
+              authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`,
+            },
+          }
+        );
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe('invalid signature');
+      });
+
+      it('should return status 200 and logged message', async () => {
+        const res = await axios.post(
+          '/auth',
+          {},
+          {
+            headers: {
+              authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+
+        expect(res.status).toBe(200);
+        expect(res.data.message).toEqual('logged');
+      });
+    });
+    describe('delete user', () => {
+      it('should return 403 no token provided', async () => {
+        const res = await axios.post('/user/delete');
+
+        expect(res.status).toBe(403);
+        expect(res.data.message).toBe('no token provided');
+      });
+
+      it('should return status 500 and jwt malformed error', async () => {
+        const res = await axios.post(
+          '/auth',
+          {},
+          { headers: { authorization: 'Bearer invalidtoken' } }
+        );
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe('jwt malformed');
+      });
+      it('should delete user successfully', async () => {
+        const res = await axios.post(
+          '/user/delete',
+          {},
+          {
+            headers: {
+              authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+        expect(res.status).toBe(200);
+        expect(res.data.message).toBe('ok');
+      });
     });
   });
 
