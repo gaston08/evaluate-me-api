@@ -5,7 +5,7 @@
   "scripts": {
     "start": "sudo kill -9 `sudo lsof -t -i:3000` & nx serve",
     "build": "nx build",
-    "test": "nx test",
+    "test": "nx e2e e2e",
     "format": "prettier --write './**/*.{js,ts,css,md,json}' --config ./.prettierrc",
     "prepare": "husky install"
   },
