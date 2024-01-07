@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 
 export type UserDocument = mongoose.Document & {
   email: string;
+  name: string;
   password: string;
   passwordResetToken: string;
   passwordResetExpires: number;
@@ -12,14 +13,6 @@ export type UserDocument = mongoose.Document & {
   twitter: string;
   google: string;
   tokens: AuthToken[];
-
-  profile: {
-    name: string;
-    gender: string;
-    location: string;
-    website: string;
-    picture: string;
-  };
 
   comparePassword: comparePasswordFunction;
   gravatar: (size: number) => string;
@@ -41,6 +34,10 @@ const userSchema = new mongoose.Schema<UserDocument>(
       type: String,
       required: true,
       unique: true,
+    },
+    name: {
+      type: String,
+      required: true,
     },
     password: {
       type: String,
@@ -75,14 +72,6 @@ const userSchema = new mongoose.Schema<UserDocument>(
         },
       ],
       required: false,
-    },
-
-    profile: {
-      name: String,
-      gender: String,
-      location: String,
-      website: String,
-      picture: String,
     },
   },
   { timestamps: true }

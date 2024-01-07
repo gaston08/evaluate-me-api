@@ -1,5 +1,6 @@
 {
 	"email": "gasti@gmail.com",
 	"password": "abcd1234",
-	"confirmPassword": "abcd1234"
+	"confirmPassword": "abcd1234",
+	"name": "gasti"
 }

@@ -18,6 +18,9 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 	await check('confirmPassword', 'Passwords do not match')
 		.equals(req.body.password)
 		.run(req);
+	await check('name', 'Name should be at least one character')
+		.isLength({ min: 1 })
+		.run(req);
 	await body('email').normalizeEmail({ gmail_remove_dots: false }).run(req);
 
 	const errors = validationResult(req);
@@ -32,6 +35,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 	const user = new User({
 		email: req.body.email,
 		password: req.body.password,
+		name: req.body.name,
 	});
 
 	try {
@@ -143,10 +147,7 @@ export const updateProfile = async (
 	try {
 		const user: UserDocument | null = await User.findById(req.user._id);
 		user.email = req.body.email || '';
-		user.profile.name = req.body.profile.name || '';
-		user.profile.gender = req.body.profile.gender || '';
-		user.profile.location = req.body.profile.location || '';
-		user.profile.website = req.body.profile.website || '';
+		user.name = req.body.name || '';
 		const userDoc = await user.save();
 		userDoc.password = undefined;
 

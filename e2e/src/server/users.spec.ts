@@ -25,6 +25,7 @@ describe('users controller', () => {
     email: 'gaston08pedraza@gmail.com',
     password: 'Abcd1234',
     confirmPassword: 'Abcd1234',
+    name: 'gaston',
   };
   afterEach(() => {
     jest.restoreAllMocks();
@@ -35,6 +36,7 @@ describe('users controller', () => {
       const res = await axios.post('/signup', {});
 
       const emailError = res.data.errors.some((err) => err.path === 'email');
+      const nameError = res.data.errors.some((err) => err.path === 'name');
       const passwordError = res.data.errors.some(
         (err) => err.path === 'password'
       );
@@ -44,6 +46,7 @@ describe('users controller', () => {
 
       expect(res.status).toBe(400);
       expect(emailError).toBe(true);
+      expect(nameError).toBe(true);
       expect(passwordError).toBe(true);
       expect(confirmPasswordError).toBe(true);
     });
@@ -51,6 +54,7 @@ describe('users controller', () => {
     it('should create an user successfully', async () => {
       const res = await axios.post('/signup', userData);
       expect(res.status).toBe(200);
+      expect(res.data.user.name).toBe('gaston');
       expect(res.data.user.email).toBe('gaston08pedraza@gmail.com');
       expect(res.data.user.password).toBe(undefined);
     });
@@ -217,39 +221,4 @@ describe('users controller', () => {
       });
     });
   });
-
-  /*it('should return hello api', async () => {
-    const res = await axios.get('/');
-
-    expect(res.status).toBe(200);
-    expect(res.data).toEqual({ message: 'Hello API' });
-  });
-
-  it('should return logged', async () => {
-    const res = await axios.post('/auth', {
-      headers: {
-        authorization: `Bearer ${access_token}`,
-      },
-    });
-
-    expect(res.status).toBe(200);
-    expect(res.data).toEqual({ message: 'logged' });
-  });
-
-  it('should return 403 no token provided', async () => {
-    const res = await axios.post('/auth');
-
-    expect(res.status).toBe(403);
-    expect(res.data).toEqual({ message: 'no token provided' });
-  });
-
-  it('should return 403 no token provided', async () => {
-    const res = await axios.post('/auth', {
-      headers: { authorization: 'bad token' },
-    });
-    console.log(res);
-
-    expect(res.status).toBe(500);
-    expect(res.data).toEqual({ message: 'jwt malformed' });
-  });*/
 });

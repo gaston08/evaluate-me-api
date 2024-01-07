@@ -1,9 +1,4 @@
 {
 	"email": "myemail@gmail.com",
-	"profile": {
-		"name": "newName",
-		"gender": "male",
-		"location": "san salvador de jujuy",
-		"website": "mywebsite.com"
-	}
+	"name": "newName"
 }
