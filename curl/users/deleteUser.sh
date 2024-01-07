@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ACCESS_TOKEN_DIR="${PWD}/access_token.txt"
+ACCESS_TOKEN_DIR="${PWD}/curl/access_token.txt"
 ACCESS_TOKEN=`cat ${ACCESS_TOKEN_DIR}`
 
 # make post request and sen user.json

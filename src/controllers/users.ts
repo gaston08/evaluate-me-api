@@ -101,7 +101,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 				if (isMatch) {
 					user.password = undefined;
 
-					const token = getAuthToken(user);
+					// expiration time in 1 hs
+					const expiresIn = 60 * 60 * 60;
+					const token = getAuthToken(user, expiresIn);
 
 					res.status(200).json({
 						token,
@@ -134,6 +136,9 @@ export const updateProfile = async (
 		.isEmail()
 		.run(req);
 	await body('email').normalizeEmail({ gmail_remove_dots: false }).run(req);
+	await check('name', 'Name should be at least one character')
+		.isLength({ min: 1 })
+		.run(req);
 
 	const errors = validationResult(req);
 
@@ -146,12 +151,20 @@ export const updateProfile = async (
 
 	try {
 		const user: UserDocument | null = await User.findById(req.user._id);
+		if (user === null) {
+			res.status(400).json({
+				error: 'user not found',
+			});
+			return;
+		}
 		user.email = req.body.email || '';
 		user.name = req.body.name || '';
 		const userDoc = await user.save();
 		userDoc.password = undefined;
 
-		const token = getAuthToken(userDoc);
+		// expiration time in 1 hs
+		const expiresIn = 60 * 60 * 60;
+		const token = getAuthToken(userDoc, expiresIn);
 
 		res.status(200).json({
 			token,
@@ -164,7 +177,10 @@ export const updateProfile = async (
 			});
 			return;
 		}
-		return next(err);
+		const { error, status } = errorHandler(err);
+		res.status(status).json({
+			error,
+		});
 	}
 };
 
@@ -200,7 +216,9 @@ export const updatePassword = async (
 
 		userDoc.password = undefined;
 
-		const token = getAuthToken(userDoc);
+		// expiration time in 1 hs
+		const expiresIn = 60 * 60 * 60;
+		const token = getAuthToken(userDoc, expiresIn);
 
 		res.status(200).json({
 			token,

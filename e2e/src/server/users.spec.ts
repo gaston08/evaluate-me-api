@@ -1,5 +1,6 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
+import { getAuthToken } from '../../../src/utils/common';
 
 axios.interceptors.response.use(
   (response) => response,
@@ -147,12 +148,13 @@ describe('users controller', () => {
       });
 
       it('should return status 500 and jwt expired error', async () => {
+        const expiredToken = getAuthToken({}, 0);
         const res = await axios.post(
           '/auth',
           {},
           {
             headers: {
-              authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTlhYWRhMWM4NWQxOWM2YTg3YTk5MWYiLCJlbWFpbCI6Imdhc3RpQGdtYWlsLmNvbSIsInRva2VucyI6W10sImNyZWF0ZWRBdCI6IjIwMjQtMDEtMDdUMTM6NTY6NDkuODg2WiIsInVwZGF0ZWRBdCI6IjIwMjQtMDEtMDdUMTM6NTY6NDkuODg2WiIsIl9fdiI6MCwiaWF0IjoxNzA0NjM1ODEyLCJleHAiOjE3MDQ2MzU4MjJ9.1F89rCSVUZmAKf-FvwyZ3RG1oIkbwfKw0qo7HAkreVE`,
+              authorization: `Bearer ${expiredToken}`,
             },
           }
         );
@@ -161,12 +163,15 @@ describe('users controller', () => {
       });
 
       it('should return status 500 and invalid signature error', async () => {
+        const invalidSignaturedToken = jwt.sign({}, 'invalidSecret', {
+          expiresIn: 1000,
+        });
         const res = await axios.post(
           '/auth',
           {},
           {
             headers: {
-              authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`,
+              authorization: `Bearer ${invalidSignaturedToken}`,
             },
           }
         );
@@ -187,6 +192,103 @@ describe('users controller', () => {
 
         expect(res.status).toBe(200);
         expect(res.data.message).toEqual('logged');
+      });
+    });
+    describe('update user', () => {
+      it('should return 403 no token provided', async () => {
+        const res = await axios.post('/user/update/profile');
+
+        expect(res.status).toBe(403);
+        expect(res.data.message).toBe('no token provided');
+      });
+
+      it('should return status 400 with errors fields', async () => {
+        const res = await axios.post(
+          '/user/update/profile',
+          {},
+          {
+            headers: {
+              authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+
+        const emailError = res.data.errors.some((err) => err.path === 'email');
+        const nameError = res.data.errors.some((err) => err.path === 'name');
+
+        expect(res.status).toBe(400);
+        expect(emailError).toBe(true);
+        expect(nameError).toBe(true);
+      });
+
+      it('should return status 500 with mongodb error ', async () => {
+        const token = getAuthToken({ _id: 'invalidIdMongoDB' }, 1000);
+        const res = await axios.post('/user/update/profile', userData, {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
+
+        const err =
+          'Cast to ObjectId failed for value "invalidIdMongoDB" (type string) at path "_id" for model "User"';
+
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe(err);
+      });
+
+      it('should return status 400 email already used', async () => {
+        const newUserToken = await axios.post('/signup', {
+          ...userData,
+          email: 'norepeatemail@gmail.com',
+        });
+        const res = await axios.post(
+          '/user/update/profile',
+          { ...userData, email: 'norepeatemail@gmail.com' },
+          {
+            headers: {
+              authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+
+        expect(res.status).toBe(400);
+        expect(res.data.message).toBe(
+          'The email address you have entered is already associated with an account.'
+        );
+        await axios.post(
+          '/user/delete',
+          {},
+          {
+            headers: {
+              authorization: `Bearer ${newUserToken}`,
+            },
+          }
+        );
+      });
+
+      it('should return status 200 with updated user', async () => {
+        const name = 'newname';
+        const email = 'newemail@gmail.com';
+        const res = await axios.post(
+          '/user/update/profile',
+          { name, email },
+          {
+            headers: {
+              authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+
+        expect(res.status).toBe(200);
+        expect(typeof res.data.token).toBe('string');
+
+        const decoded = jwt.verify(
+          res.data.token,
+          process.env.SECRET_TOKEN_KEY
+        );
+        expect(decoded.email).toBe(email);
+        expect(decoded.name).toBe(name);
+        expect(decoded.password).toBe(undefined);
       });
     });
     describe('delete user', () => {
@@ -218,6 +320,19 @@ describe('users controller', () => {
         );
         expect(res.status).toBe(200);
         expect(res.data.message).toBe('ok');
+      });
+    });
+    describe('post user delete', () => {
+      it('updateUser / should return status 400 user not found', async () => {
+        const token = getAuthToken({ _id: 'invalidIdMongoDB' }, 1000);
+        const res = await axios.post('/user/update/profile', userData, {
+          headers: {
+            authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        expect(res.status).toBe(400);
+        expect(res.data.error).toBe('user not found');
       });
     });
   });
