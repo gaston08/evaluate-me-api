@@ -189,8 +189,7 @@ export const updateProfile = async (
  */
 export const updatePassword = async (
 	req: Request,
-	res: Response,
-	next: NextFunction
+	res: Response
 ): Promise<void> => {
 	await check('password', 'Password must be at least 4 characters long')
 		.isLength({ min: 4 })
@@ -210,6 +209,14 @@ export const updatePassword = async (
 
 	try {
 		const user: UserDocument | null = await User.findById(req.user._id);
+
+		if (user === null) {
+			res.status(400).json({
+				error: 'user not found',
+			});
+			return;
+		}
+
 		user.password = req.body.password;
 		const userDoc = await user.save();
 
@@ -223,7 +230,10 @@ export const updatePassword = async (
 			token,
 		});
 	} catch (err) {
-		return next(err);
+		const { error, status } = errorHandler(err);
+		res.status(status).json({
+			error,
+		});
 	}
 };
 

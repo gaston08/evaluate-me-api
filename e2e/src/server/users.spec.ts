@@ -28,6 +28,10 @@ describe('users controller', () => {
     confirmPassword: 'Abcd1234',
     name: 'gaston',
   };
+  const userPass = {
+    password: 'NewPassword',
+    confirmPassword: 'NewPassword',
+  };
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -291,6 +295,67 @@ describe('users controller', () => {
         expect(decoded.password).toBe(undefined);
       });
     });
+    describe('update password', () => {
+      it('should return 403 no token provided', async () => {
+        const res = await axios.post('/user/update/password');
+
+        expect(res.status).toBe(403);
+        expect(res.data.message).toBe('no token provided');
+      });
+
+      it('should return status 400 with errors fields', async () => {
+        const res = await axios.post(
+          '/user/update/password',
+          {},
+          {
+            headers: { authorization: `Bearer ${access_token}` },
+          }
+        );
+
+        const passwordError = res.data.errors.some(
+          (err) => err.path === 'password'
+        );
+        const confirmPasswordError = res.data.errors.some(
+          (err) => err.path === 'confirmPassword'
+        );
+
+        expect(res.status).toBe(400);
+        expect(passwordError).toBe(true);
+        expect(confirmPasswordError).toBe(true);
+      });
+
+      it('should return status 500 with mongodb error ', async () => {
+        const token = getAuthToken({ _id: 'invalidIdMongoDB' }, 1000);
+        const res = await axios.post('/user/update/password', userPass, {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
+
+        const err =
+          'Cast to ObjectId failed for value "invalidIdMongoDB" (type string) at path "_id" for model "User"';
+
+        expect(res.status).toBe(500);
+        expect(res.data.error).toBe(err);
+      });
+
+      it('should return status 200 with updated password', async () => {
+        const res = await axios.post('/user/update/password', userPass, {
+          headers: {
+            authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        expect(res.status).toBe(200);
+        expect(typeof res.data.token).toBe('string');
+
+        const decoded = jwt.verify(
+          res.data.token,
+          process.env.SECRET_TOKEN_KEY
+        );
+        expect(decoded.password).toBe(undefined);
+      });
+    });
     describe('delete user', () => {
       it('should return 403 no token provided', async () => {
         const res = await axios.post('/user/delete');
@@ -324,8 +389,18 @@ describe('users controller', () => {
     });
     describe('post user delete', () => {
       it('updateUser / should return status 400 user not found', async () => {
-        const token = getAuthToken({ _id: 'invalidIdMongoDB' }, 1000);
         const res = await axios.post('/user/update/profile', userData, {
+          headers: {
+            authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        expect(res.status).toBe(400);
+        expect(res.data.error).toBe('user not found');
+      });
+
+      it('updatePassword / should return status 400 user not found', async () => {
+        const res = await axios.post('/user/update/password', userPass, {
           headers: {
             authorization: `Bearer ${access_token}`,
           },
