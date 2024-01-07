@@ -129,8 +129,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
  */
 export const updateProfile = async (
 	req: Request,
-	res: Response,
-	next: NextFunction
+	res: Response
 ): Promise<void> => {
 	await check('email', 'Please enter a valid email address.')
 		.isEmail()
