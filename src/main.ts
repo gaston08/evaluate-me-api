@@ -1,6 +1,5 @@
 import express from 'express';
 import morgan from 'morgan';
-import nodemailer from 'nodemailer';
 import connect from './connect';
 
 // controllers
@@ -40,14 +39,6 @@ app.post(
 );
 app.post('/user/forgot/password', usersController.forgotPassword);
 app.post('/user/reset/password/:token', usersController.resetPassword);
-
-export const transporter = nodemailer.createTransport({
-  service: 'Outlook365',
-  auth: {
-    user: process.env.EMAIL_SENDER,
-    pass: process.env.EMAIL_SENDER_PASSWORD,
-  },
-});
 
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);

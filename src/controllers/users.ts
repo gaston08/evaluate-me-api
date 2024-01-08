@@ -3,7 +3,7 @@ import { body, check, validationResult } from 'express-validator';
 import { User, UserDocument } from '../models/User';
 import { getAuthToken, errorHandler } from '../utils/common';
 import crypto from 'crypto';
-import { transporter } from '../main';
+import { transporter } from '../utils/transporter';
 
 /**
  * Create a new local account.
