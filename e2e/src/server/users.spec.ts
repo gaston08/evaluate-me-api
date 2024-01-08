@@ -28,6 +28,11 @@ describe('users controller', () => {
     confirmPassword: 'Abcd1234',
     name: 'gaston',
   };
+
+  const newUserData = {
+    name: 'newname',
+    email: 'newemail@gmail.com',
+  };
   const userPass = {
     password: 'NewPassword',
     confirmPassword: 'NewPassword',
@@ -59,8 +64,8 @@ describe('users controller', () => {
     it('should create an user successfully', async () => {
       const res = await axios.post('/signup', userData);
       expect(res.status).toBe(200);
-      expect(res.data.user.name).toBe('gaston');
-      expect(res.data.user.email).toBe('gaston08pedraza@gmail.com');
+      expect(res.data.user.name).toBe(userData.name);
+      expect(res.data.user.email).toBe(userData.email);
       expect(res.data.user.password).toBe(undefined);
     });
 
@@ -117,7 +122,7 @@ describe('users controller', () => {
       expect(typeof res.data.token).toBe('string');
 
       const decoded = jwt.verify(access_token, process.env.SECRET_TOKEN_KEY);
-      expect(decoded.email).toBe('gaston08pedraza@gmail.com');
+      expect(decoded.email).toBe(userData.email);
       expect(decoded.password).toBe(undefined);
     });
   });
@@ -271,11 +276,9 @@ describe('users controller', () => {
       });
 
       it('should return status 200 with updated user', async () => {
-        const name = 'newname';
-        const email = 'newemail@gmail.com';
         const res = await axios.post(
           '/user/update/profile',
-          { name, email },
+          { name: newUserData.name, email: newUserData.email },
           {
             headers: {
               authorization: `Bearer ${access_token}`,
@@ -290,8 +293,8 @@ describe('users controller', () => {
           res.data.token,
           process.env.SECRET_TOKEN_KEY
         );
-        expect(decoded.email).toBe(email);
-        expect(decoded.name).toBe(name);
+        expect(decoded.email).toBe(newUserData.email);
+        expect(decoded.name).toBe(newUserData.name);
         expect(decoded.password).toBe(undefined);
       });
     });
@@ -355,6 +358,34 @@ describe('users controller', () => {
         );
         expect(decoded.password).toBe(undefined);
       });
+    });
+    describe('forgot password', () => {
+      it('should return status 400 with errors fields', async () => {
+        const res = await axios.post('/user/forgot/password', {});
+
+        const emailError = res.data.errors.some((err) => err.path === 'email');
+
+        expect(res.status).toBe(400);
+        expect(emailError).toBe(true);
+      });
+
+      it('should return status 400 not account found', async () => {
+        const res = await axios.post('/user/forgot/password', {
+          email: 'x@x.com',
+        });
+
+        expect(res.status).toBe(400);
+        expect(res.data.message).toBe(`account with that email doesn't exist`);
+      });
+
+      /*it('should return status 200 email sended', async () => {
+        const res = await axios.post('/user/forgot/password', {
+          email: newUserData.email,
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.data.message).toBe(`email sended`);
+      });*/
     });
     describe('delete user', () => {
       it('should return 403 no token provided', async () => {
